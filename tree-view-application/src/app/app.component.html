@@ -1,0 +1,16 @@
+<div class="data-container">
+  <div>
+    <input type="text" (input)="onSearch($event)" placeholder="Search tree..." />
+  </div>
+  <ul class="tree">
+    <ng-container *ngIf="treeData.length > 0; else noData">
+      <ng-container *ngFor="let node of treeData; trackBy: trackBy">
+        <app-tree-node [node]="node" [treeData]="treeData">
+        </app-tree-node>
+      </ng-container>
+    </ng-container>
+    <ng-template #noData>
+      <p class="no-data-message">No results found!</p>
+    </ng-template>
+  </ul>
+</div>
