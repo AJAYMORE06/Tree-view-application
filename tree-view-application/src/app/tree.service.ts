@@ -6,9 +6,10 @@ import { TreeNode } from './tree.model';
   providedIn: 'root'
 })
 export class TreeService {
-  private cache: Map<string, TreeNode[]> = new Map();
+  private cache: Map<string, TreeNode[]> = new Map(); // FOR CACHE CONTROL
   constructor() { }
 
+  // mock data containing single source for parent, child and subchildren. We can keep them separately as well.
   public mockTreeData: TreeNode[] = [
     { id: '1', name: 'Root 1', childCount: 3, parentId: '-1', isExpanded: false, isLoading: false, isSelected: false },
     { id: '2', name: 'Root 2', childCount: 2, parentId: '-1', isExpanded: false, isLoading: false, isSelected: false },
@@ -22,14 +23,17 @@ export class TreeService {
     { id: '1-2-2-1', name: 'Grandchild 1-2-2-1', childCount: 0, parentId: '1-2-2', isExpanded: false, isLoading: false, isSelected: false }
   ]
 
+  // call for fetching root nodes. i.e parents with parentId = -1
   public getRootNodes(): Observable<TreeNode[]> {
     const rootNodes = this.mockTreeData.filter(node => node.parentId === '-1');
     return of(rootNodes).pipe(delay(this.getRandomDelay()), catchError(this.handleError));
   }
 
+  // lazy loaded call for fetching child nodes according to the parent node id
   public getChildNodes(nodeId: string): Observable<TreeNode[]> {
-    const mockChildData = this.mockTreeData.filter(node => node.parentId === nodeId);
+    const mockChildData = this.mockTreeData.filter(node => node.parentId === nodeId); // filtering mock data as per parent Id
 
+    // cache control - checking if data is present in cache or not, if data is present, then there is no need of an API call. We can get the data from saved cache.
     if (this.cache.has(nodeId)) {
       console.info("CACHE : Data is present in Cache")
       return of(this.cache.get(nodeId)!).pipe(
@@ -41,7 +45,7 @@ export class TreeService {
     console.info("CACHE : Data not present in Cache")
 
     const randomFailure = Math.random() > 0.5;
-    return (randomFailure
+    return (randomFailure // random failure scenario has been created to show error handeling and retry operation
       ? throwError(() => new Error(`Failed to fetch child nodes for parentId: ${nodeId}`))
       : of(mockChildData)).pipe(
         delay(this.getRandomDelay()), // Add a random delay before retrying
@@ -66,6 +70,7 @@ export class TreeService {
       )
   }
 
+  // Filtering the data on the basis of searched query
   public searchQuery(searchQuery: string): Observable<TreeNode[]> {
     if (!searchQuery.trim()) {
       // If search query is empty, return the full tree
@@ -85,9 +90,7 @@ export class TreeService {
     return of(filteredTree);
   }
 
-  /**
- * Filters and highlights the nodes based on the search query
- */
+  //  Filters and highlights the nodes based on the search query
   private filterAndHighlightNodes(query: string, nodes: TreeNode[]): any[] {
     return nodes
       .map(node => {
@@ -104,17 +107,13 @@ export class TreeService {
       .filter(node => node !== null);
   }
 
-  /**
-   * Highlight the search query within the node's name
-   */
+  // Highlight the search query within the node's name
   private highlightText(text: string, query: string): string {
     const regex = new RegExp(`(${query})`, 'gi'); // case-insensitive regex for search query
     return text.replace(regex, `<mark>$1</mark>`); // Wrap matching text with <mark> tag
   }
 
-  /**
-   * Recursively adds all parent nodes of a given node.
-   */
+  // Recursively adds all parent nodes of a given node.
   private collectAllParents(node: TreeNode, matchedNodes: Set<TreeNode>) {
     if (!node || node.parentId === '-1') return;
 
@@ -125,9 +124,7 @@ export class TreeService {
     }
   }
 
-  /**
-   * Builds the hierarchical tree structure from a flat filtered list.
-   */
+  // Builds the hierarchical tree structure from a flat filtered list.
   private buildTreeStructure(flatNodes: TreeNode[]): TreeNode[] {
     const nodeMap = new Map<string, TreeNode>();
     const tree: TreeNode[] = [];
@@ -147,19 +144,18 @@ export class TreeService {
         tree.push(nodeMap.get(node.id)!);
       }
     });
-
     return tree;
   }
 
 
-  /** ✅ Handle API errors */
+  // Handling API errors
   private handleError(error: any): Observable<never> {
     console.log(error)
     console.error('Error occurred:', error);
     return throwError(() => error);
   }
 
-  /** ✅ Random delay simulation */
+  // For random delay simulation
   private getRandomDelay(): number {
     return Math.floor(Math.random() * 500) + 500; // Random delay between 500ms - 1000ms
   }

@@ -6,5 +6,5 @@ export interface TreeNode {
   children?: TreeNode[];
   isExpanded?: boolean;
   isLoading?: boolean;
-  isSelected?: boolean;
+  isSelected?: boolean; // added for keeping the track of selected status of a node
 }

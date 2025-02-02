@@ -7,7 +7,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
   selector: 'app-tree-node',
   templateUrl: './app-tree-node.component.html',
   styleUrls: ['./app-tree-node.component.scss'],
-  animations: [
+  animations: [  // angular animation added to show the expand and collapse motion in flow
     trigger('expandCollapse', [
       state('collapsed', style({
         height: '0px',
@@ -26,7 +26,12 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 })
 export class AppTreeNodeComponent {
   public errorMessage: string = ''; // Error message for any errors that occur
-  @Input() node!: TreeNode; // Node for this component
+  @Input() node: TreeNode = {
+    id: '',
+    name: '',
+    childCount: 0,
+    parentId: ''
+  }; // Node for this component
   @Input() treeData!: TreeNode[]; // Full tree data
   @Output() loadChildren = new EventEmitter<any>(); // Event emitter to notify when children need to be loaded
 

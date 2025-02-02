@@ -1,15 +1,19 @@
 <div class="data-container">
+  <!-- search input field-->
   <div>
     <input type="text" (input)="onSearch($event)" placeholder="Search tree..." />
   </div>
   <ul class="tree">
+    <!-- Check if dataSource have data or not-->
     <ng-container *ngIf="treeData.length > 0; else noData">
       <ng-container *ngFor="let node of treeData; trackBy: trackBy">
+        <!-- calling app-tree-node selector and passing the node-->
         <app-tree-node [node]="node" [treeData]="treeData">
         </app-tree-node>
       </ng-container>
     </ng-container>
     <ng-template #noData>
+      <!-- showing no data message-->
       <p class="no-data-message">No results found!</p>
     </ng-template>
   </ul>
