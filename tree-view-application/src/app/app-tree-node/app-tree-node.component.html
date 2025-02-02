@@ -1,0 +1,16 @@
+<li>
+  <span (click)="toggleNode()" [attr.tabindex]="0" (keydown)="onKeydown($event, node)" *ngIf="node.childCount > 0">
+    {{ node.isExpanded ? '▼' : '▶' }}
+  </span>
+  <input type="checkbox" [(ngModel)]="node.isSelected" (change)="onNodeSelect(node)" /> <span
+    [innerHTML]="node.name"></span>
+  <span *ngIf="node.isLoading">Loading...</span>
+
+  <ul *ngIf="node.isExpanded" [@expandCollapse]="node.isExpanded ? 'expanded' : 'collapsed'">
+    <ng-container *ngFor="let child of node.children">
+      <app-tree-node [node]="child" [treeData]="treeData" (loadChildren)="loadChildren.emit($event)">
+      </app-tree-node>
+    </ng-container>
+  </ul>
+</li>
+<p class="no-data-message" *ngIf="!node.children">{{ errorMessage }}</p>
